@@ -56,7 +56,7 @@ def main():
         # キー入力など、イベント処理
         x1_pt,y1_pt = event_proc(x1_pt,y1_pt)
 
-        y1_pt = y1_pt + 50        #ブロック落下
+        y1_pt = y1_pt + 50        # ブロック落下
 
         #ブロック当たりチェック
         retCollision:bool = chekCollision(int(x1_pt/50), int(y1_pt/50), list0)
