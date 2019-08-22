@@ -17,6 +17,7 @@ def main():
     #変数の初期化
     x1_pt = 150
     y1_pt = 0
+    score = 0
     list1 = [[1, 0, 0, 0, 0, 0, 1],
              [1, 0, 0, 0, 0, 0, 1],
              [1, 0, 0, 0, 0, 0, 1],
@@ -31,7 +32,6 @@ def main():
     pygame.init()    # Pygameの初期化
     screen = pygame.display.set_mode((800, 700))  # 画面サイズを指定して画面を生成
     pygame.display.set_caption("GAME")  # タイトルバーに表示する文字
-    font = pygame.font.Font(None, 40)  # フォントの設定(55px)
     screen.fill((0, 0, 0))      # 画面を黒色に塗りつぶし
     list0 = copy.deepcopy(list1)    # ディープコピー
     screen.fill((0, 0, 0))      # ウィンドウの背景色
@@ -63,7 +63,7 @@ def main():
             #ブロックの固定
             list0 = setBlockList(int(x1_pt/50), int(y1_pt/50), catColor, list0)
             #並びブロックのチェックと削除
-            list0 = chekDeleteCat(int(x1_pt/50), int(y1_pt/50), list0)
+            list0,score = chekDeleteCat(int(x1_pt/50), int(y1_pt/50), list0, score)
             catColor = random.randint(2, 7)     # 次の猫色を決める
             y1_pt = 0                           # ぶつかったのでy座標をゼロに戻す
             put_frame(screen, list0)            # 画面に枠を置く
@@ -71,20 +71,31 @@ def main():
         # 閾値超えたら戻るように
         if y1_pt > 400:
             y1_pt = 0
+
+        #落ちてくるブロック（猫）を画面に置く
         putDropCat(screen, catColor, x1_pt, y1_pt)
 
-        # screen.blit(font.render("AAA", True, (255,255,0)), [40, 40])# 文字列の表示位置
         ##pygame.display.flip()  # display Surface全体を更新して画面に描写します。
         pygame.display.update()     # スクリーンの一部分のみを更新します。この命令はソフトウェア側での表示処理に最適化されています。
 
+        putScore(screen,score)      # スコアの表示
+
+## スコアの表示
+def putScore(screen,score):
+    font = pygame.font.Font(None, 40)  # フォントの設定(55px)
+    put_img(screen, getBlockImg(0), 400, 50)  # スコア表示部分に黒ブロックを置いて消す
+    put_img(screen, getBlockImg(0), 450, 50)  # スコア表示部分に黒ブロックを置いて消す
+    put_img(screen, getBlockImg(0), 500, 50)  # スコア表示部分に黒ブロックを置いて消す
+    screen.blit(font.render(str(score), True, (255,255,0)), [400, 50])# 文字列の表示位置
+
 ## ブロックの削除対象チェックと削除
-def chekDeleteCat(x, y, list0: list) -> list:
+def chekDeleteCat(x, y, list0: list, score) :
     if y>6:
         # 底から2段目以下ならば3個並んでいないので即返る
-        return list0
+        return list0,score
     elif y<2:
         # 天から2段目以上ならば3個並んでいないので即返る
-        return list0
+        return list0,score
     cat0 = list0[y][x]
     cat1 = list0[y+1][x]
     cat2 = list0[y+2][x]
@@ -93,7 +104,8 @@ def chekDeleteCat(x, y, list0: list) -> list:
         list0[y][x]=0
         list0[y + 1][x]=0
         list0[y + 2][x]=0
-    return list0
+        score = score + 3
+    return list0,score
 
 ## ブロックの当たり判定　※簡易なので下しか見ていない。本来は横も見る
 def chekCollision(x, y, list0:list) -> bool:
